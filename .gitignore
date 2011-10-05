@@ -1,0 +1,4 @@
+*.o
+TEST/hwserver
+TEST/hwclient
+*_dats.c
