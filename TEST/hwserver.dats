@@ -12,10 +12,8 @@ staload "contrib/libzmq/SATS/libzmq.sats"
 %}
 
 %{
-void cmain ()
+void cmain (void* context)
 {
-    void *context = zmq_init (1);
-
     //  Socket to talk to clients
     void *responder = zmq_socket (context, ZMQ_REP);
     zmq_bind (responder, "tcp://*:5555");
@@ -40,10 +38,14 @@ void cmain ()
     }
     //  We never get here but if we did, this would be how we end
     zmq_close (responder);
-    zmq_term (context);
 }
 %}
-extern fun cmain () : void = "mac#cmain"
+extern fun cmain {l:agz} (context: !zmqcontext l) : void = "mac#cmain"
 
-implement main () = cmain ()
+implement main () = {
+  val context = zmq_init (1)
+  val () = assert_errmsg(~context, "zmq_init failed")
+  val () = cmain (context)
+  val _ = zmq_term (context)
+}
 

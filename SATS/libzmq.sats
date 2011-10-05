@@ -19,3 +19,11 @@
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
+absviewtype zmqcontext (l:addr)
+fun zmqcontext_null () :<> zmqcontext (null) = "mac#atspre_null_ptr"
+fun zmqcontext_is_null {l:addr} (p: !zmqcontext l):<> bool (l==null) = "mac#atspre_ptr_is_null"
+fun zmqcontext_isnot_null {l:addr} (p: !zmqcontext l):<> bool (l > null) = "mac#atspre_ptr_isnot_null"
+overload ~ with zmqcontext_isnot_null
+
+fun zmq_init {n:nat} (io_threads: int n): [l:addr] zmqcontext l = "mac#zmq_init"
+fun zmq_term {l:agz} (context: zmqcontext l): int = "mac#zmq_term"
