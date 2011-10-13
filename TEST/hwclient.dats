@@ -17,15 +17,16 @@ implement main () = {
       var request: zmq_msg_t?
       val s = string1_of_string ("Hello")
       val _ = zmq_msg_init_size (request, string1_length(s))
-      val (pf_data, fpf_data | p_data) = zmq_msg_data (request)
+      val (pf_data, fpf_data | p_data) = zmq_msg_data (view@ request | &request)
 
       val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
       val _ = memcpy (pf_data | p_data, !p_bytes, string1_length(s))
       prval () = fpf_bytes(pf_bytes)
+      prval () = fpf_data(view@ request | pf_data, &request) 
 
       val () = printf("Sending Hello %d...\n", @(n))
       val _ = zmq_send (r, request, 0)
-      prval () = fpf_data(pf_data)
+(*      prval () = fpf_data(pf_data, request) *)
 
       var reply: zmq_msg_t?
       val _ = zmq_msg_init (reply)

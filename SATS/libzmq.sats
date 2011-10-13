@@ -37,7 +37,14 @@ ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 fun zmq_msg_close (msg: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_close"
 fun zmq_msg_move (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_move"
 fun zmq_msg_copy (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t): int = "mac#zmq_msg_copy"
-fun zmq_msg_data {n:nat} (msg: &zmq_msg_t n): [l:addr] (bytes n @ l, (bytes n @ l) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
+
+(* The returned pointer is internal to the 'msg' object. The returned proof function takes this
+   'msg' as a parameter to ensure that it cannot be destroyed while the data pointer
+   is still active.
+*)
+(* fun zmq_msg_data {n:nat} (msg: &zmq_msg_t n): [l:addr] (bytes n @ l, (bytes n @ l, zmq_msg_t n) -<lin,prf> void | ptr l) = "mac#zmq_msg_data" *)
+fun zmq_msg_data {n:nat} {l3:agz} (pf: !zmq_msg_t n @ l3 | msg: ptr l3): [l:addr] (bytes n @ l, (!zmq_msg_t n @ l3 | bytes n @ l, ptr l3) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
+
 fun zmq_msg_size {n:nat} (msg: &zmq_msg_t >> zmq_msg_t n): size_t n = "mac#zmq_msg_size"
 
 abst@ype zmqsockettype = $extype "int"

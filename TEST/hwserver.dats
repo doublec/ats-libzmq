@@ -40,7 +40,7 @@ implement main () = {
     val _ = memcpy (pf_data | p_data, !p_bytes, string1_length(s))
 
     prval () = fpf_bytes(pf_bytes)
-    prval () = fpf_data(pf_data)
+    prval () = fpf_data(pf_data, reply)
 
     val _ = zmq_send (r, reply, 0);
   in
