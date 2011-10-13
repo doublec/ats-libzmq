@@ -12,11 +12,8 @@ staload "contrib/libzmq/SATS/libzmq.sats"
 %}
 
 %{
-void cmain (void* context)
+void cmain (void* requester)
 {
-    //  Socket to talk to server
-    printf ("Connecting to hello world server...\n");
-    void *requester = zmq_socket (context, ZMQ_REQ);
     zmq_connect (requester, "tcp://localhost:5555");
 
     int request_nbr;
@@ -34,14 +31,21 @@ void cmain (void* context)
         printf ("Received World %d\n", request_nbr);
         zmq_msg_close (&reply);
     }
-    zmq_close (requester);
 }
 %}
-extern fun cmain {l:agz} (context: !zmqcontext l) : void = "mac#cmain"
+extern fun cmain {l:agz} (requester: !zmqsocket l) : void = "mac#cmain"
 
 implement main () = {
   val context = zmq_init (1)
   val () = assert_errmsg(~context, "zmq_init failed")
-  val () = cmain (context)
+
+  (*  Socket to talk to server *)
+  val () = print_string ("Connecting to hello world server...\n");
+  val requester = zmq_socket(context, ZMQ_REQ)
+  val () = assert_errmsg(~requester, "zmq_socket failed")
+
+  val () = cmain (requester)
+
+  val _ = zmq_close(requester)
   val _ = zmq_term (context)
 }
