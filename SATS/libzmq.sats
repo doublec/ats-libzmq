@@ -26,8 +26,8 @@ typedef zmq_msg_t = [i:nat] zmq_msg_t (i)
 typedef zmq_free_fn = {l:agz} {l2:addr} (data: ptr l, hint: ptr l2) -> void
 *)
 
-fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t): int = "mac#zmq_msg_init"
-fun zmq_msg_init_size {i:int} {n:nat} (msg: &zmq_msg_t (i)? >> zmq_msg_t (n), size: size_t n): int = "mac#zmq_msg_init_size"
+fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t 0): int = "mac#zmq_msg_init"
+fun zmq_msg_init_size {i:int} {n:nat} (msg: &zmq_msg_t i? >> zmq_msg_t n, size: size_t n): int = "mac#zmq_msg_init_size"
 
 (*
 ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
@@ -37,8 +37,8 @@ ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 fun zmq_msg_close (msg: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_close"
 fun zmq_msg_move (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_move"
 fun zmq_msg_copy (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t): int = "mac#zmq_msg_copy"
-fun zmq_msg_data {x:int} (msg: &zmq_msg_t (x)): [l:addr] [n:int | n == x] (bytes n @ l, (bytes n @ l) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
-fun zmq_msg_size (msg: &zmq_msg_t): [n:nat] size_t n = "mac#zmq_msg_size"
+fun zmq_msg_data {n:nat} (msg: &zmq_msg_t n): [l:addr] (bytes n @ l, (bytes n @ l) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
+fun zmq_msg_size {n:nat} (msg: &zmq_msg_t >> zmq_msg_t n): size_t n = "mac#zmq_msg_size"
 
 abst@ype zmqsockettype = $extype "int"
 macdef ZMQ_PAIR = $extval (zmqsockettype, "ZMQ_PAIR")
