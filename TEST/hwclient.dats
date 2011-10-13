@@ -4,38 +4,38 @@
   Sends "Hello" to server, expects "World" back
 *)
 staload "contrib/libzmq/SATS/libzmq.sats"
+staload "prelude/SATS/string.sats"
+staload "libc/SATS/string.sats"
 
-%{^
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
-%}
-
-%{
-void cmain (void* requester)
-{
-    zmq_connect (requester, "tcp://localhost:5555");
-
-    int request_nbr;
-    for (request_nbr = 0; request_nbr != 10; request_nbr++) {
-        zmq_msg_t request;
-        zmq_msg_init_size (&request, 5);
-        memcpy (zmq_msg_data (&request), "Hello", 5);
-        printf ("Sending Hello %d...\n", request_nbr);
-        zmq_send (requester, &request, 0);
-        zmq_msg_close (&request);
-
-        zmq_msg_t reply;
-        zmq_msg_init (&reply);
-        zmq_recv (requester, &reply, 0);
-        printf ("Received World %d\n", request_nbr);
-        zmq_msg_close (&reply);
-    }
-}
-%}
-extern fun cmain {l:agz} (requester: !zmqsocket l) : void = "mac#cmain"
+extern castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, bytes (n) @ l -<lin,prf> void | ptr l)
 
 implement main () = {
+  fun loop_requests {l:agz} {n,m:nat | m >= n} .< m-n >. (r: !zmqsocket l, n: int n, max: int m): void =
+    if n = max then
+      ()
+    else let
+      var request: zmq_msg_t?
+      val s = string1_of_string ("Hello")
+      val _ = zmq_msg_init_size (request, string1_length(s))
+      val (pf_data, fpf_data | p_data) = zmq_msg_data (request)
+
+      val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
+      val _ = memcpy (pf_data | p_data, !p_bytes, string1_length(s))
+      prval () = fpf_bytes(pf_bytes)
+
+      val () = printf("Sending Hello %d...\n", @(n))
+      val _ = zmq_send (r, request, 0)
+      prval () = fpf_data(pf_data)
+
+      var reply: zmq_msg_t?
+      val _ = zmq_msg_init (reply)
+      val _ = zmq_recv (r, reply, 0)
+      val () = printf("Received World %d\n", @(n))
+      val _ = zmq_msg_close (reply)
+    in
+      loop_requests (r, n + 1, max)
+    end
+
   val context = zmq_init (1)
   val () = assert_errmsg(~context, "zmq_init failed")
 
@@ -44,7 +44,8 @@ implement main () = {
   val requester = zmq_socket(context, ZMQ_REQ)
   val () = assert_errmsg(~requester, "zmq_socket failed")
 
-  val () = cmain (requester)
+  val _ = zmq_connect (requester, "tcp://localhost:5555")
+  val () = loop_requests (requester, 0, 10)
 
   val _ = zmq_close(requester)
   val _ = zmq_term (context)

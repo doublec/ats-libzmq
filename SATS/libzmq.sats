@@ -19,14 +19,15 @@
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
-abst@ype zmq_msg_t = $extype "zmg_msg_t"
+abst@ype zmq_msg_t (n:int) = $extype "zmq_msg_t"
+typedef zmq_msg_t = [i:nat] zmq_msg_t (i)
 
 (*
 typedef zmq_free_fn = {l:agz} {l2:addr} (data: ptr l, hint: ptr l2) -> void
 *)
 
-fun zmq_msg_init (msg: &zmq_msg_t?): int = "mac#zmq_msg_init"
-fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t?, size: size_t n): int = "mac#zmq_msg_init_size"
+fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t): int = "mac#zmq_msg_init"
+fun zmq_msg_init_size {i:int} {n:nat} (msg: &zmq_msg_t (i)? >> zmq_msg_t (n), size: size_t n): int = "mac#zmq_msg_init_size"
 
 (*
 ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
@@ -36,7 +37,7 @@ ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
 fun zmq_msg_close (msg: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_close"
 fun zmq_msg_move (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_move"
 fun zmq_msg_copy (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t): int = "mac#zmq_msg_copy"
-fun zmq_msg_data (msg: &zmq_msg_t): [l:addr] ptr l = "mac#zmq_msg_data"
+fun zmq_msg_data {x:int} (msg: &zmq_msg_t (x)): [l:addr] [n:int | n == x] (bytes n @ l, (bytes n @ l) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
 fun zmq_msg_size (msg: &zmq_msg_t): [n:nat] size_t n = "mac#zmq_msg_size"
 
 abst@ype zmqsockettype = $extype "int"
@@ -97,12 +98,12 @@ overload ~ with zmqsocket_isnot_null
 
 fun zmq_socket {l:agz} (context: !zmqcontext l, type: zmqsockettype): [l2:addr] zmqsocket l2 = "mac#zmq_socket"
 fun zmq_close {l:agz} (socket: zmqsocket l): int = "mac#zmq_close"
-fun zmq_setsockopt {l,l2:agz} {n:nat} (socket: zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#setsockopt"
-fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#getsockopt"
-fun zmq_bind {l:agz} (socket: zmqsocket l, endpoint: string): int = "mac#zmq_bind"
-fun zmq_connect {l:agz} (socket: zmqsocket l, endpoint: string): int = "mac#zmq_connect"
+fun zmq_setsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#setsockopt"
+fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#getsockopt"
+fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bind"
+fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_connect"
 
-fun zmq_send {l:agz} (socket: zmqsocket l, msg: &zmq_msg_t >> zmq_msg_t?, flags: int): int = "mac#zmq_send"
-fun zmq_recv {l:agz} (socket: zmqsocket l, msg: &zmq_msg_t >> zmq_msg_t?, flags: int): int = "mac#zmq_recv"
+fun zmq_send {l:agz} (socket: !zmqsocket l, msg: &zmq_msg_t >> zmq_msg_t?, flags: int): int = "mac#zmq_send"
+fun zmq_recv {l:agz} (socket: !zmqsocket l, msg: &zmq_msg_t, flags: int): int = "mac#zmq_recv"
 
 
