@@ -19,33 +19,53 @@
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
-abst@ype zmq_msg_t (n:int) = $extype "zmq_msg_t"
-typedef zmq_msg_t = [i:nat] zmq_msg_t (i)
 
 (*
+   zmq_msg_t has the size, 'n', and the internal data pointer, 'data' as parameters.
+   The former is used to ensure that access to the internal data is correctly bounded
+   by the size. The latter is 'null' until 'zmq_msg_data' is called. In this case it
+   is the address of the internal data. It is reset back to 'null' when the internal data
+   pointer is no longer needed. The ensures that dangling references to the data pointer
+   aren't kept around when zmq functions that can free the data are called (zmq_send,
+   zmq_recv, etc).
+*)
+abst@ype zmq_msg_t (n:int, data:addr) = $extype "zmq_msg_t"
+typedef zmq_msg_t = zmq_msg_t (0, null)
+
+(*
+TODO: get this and zmq_init_data working
 typedef zmq_free_fn = {l:agz} {l2:addr} (data: ptr l, hint: ptr l2) -> void
 *)
 
-fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t 0): int = "mac#zmq_msg_init"
-fun zmq_msg_init_size {i:int} {n:nat} (msg: &zmq_msg_t i? >> zmq_msg_t n, size: size_t n): int = "mac#zmq_msg_init_size"
+fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t): int = "mac#zmq_msg_init"
+fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t? >> zmq_msg_t (n, null), size: size_t n): int = "mac#zmq_msg_init_size"
 
 (*
+TODO: 
 ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
     size_t size, zmq_free_fn *ffn, void *hint);
 *)
 
-fun zmq_msg_close (msg: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_close"
-fun zmq_msg_move (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t?): int = "mac#zmq_msg_move"
-fun zmq_msg_copy (dest: &zmq_msg_t, src: &zmq_msg_t >> zmq_msg_t): int = "mac#zmq_msg_copy"
+fun zmq_msg_close {n:nat} (msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?): int = "mac#zmq_msg_close"
+fun zmq_msg_move {n,n2:nat} (dest: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), src: &zmq_msg_t (n2, null) >> zmq_msg_t (0, null)?): int = "mac#zmq_msg_move"
+
+(* TODO: How to express the constraint from http://api.zeromq.org/2-1:zmq-msg-copy:
+         "Avoid modifying message content after a message has been copied with zmq_msg_copy(), doing so can result in undefined behaviour. "
+*)
+fun zmq_msg_copy {n,n2:nat} (dest: &zmq_msg_t (n,null) >> zmq_msg_t (n2, null), src: &zmq_msg_t (n2, null)): int = "mac#zmq_msg_copy"
 
 (* The returned pointer is internal to the 'msg' object. The returned proof function takes this
    'msg' as a parameter to ensure that it cannot be destroyed while the data pointer
    is still active.
 *)
-(* fun zmq_msg_data {n:nat} (msg: &zmq_msg_t n): [l:addr] (bytes n @ l, (bytes n @ l, zmq_msg_t n) -<lin,prf> void | ptr l) = "mac#zmq_msg_data" *)
-fun zmq_msg_data {n:nat} {l3:agz} (pf: !zmq_msg_t n @ l3 | msg: ptr l3): [l:addr] (bytes n @ l, (!zmq_msg_t n @ l3 | bytes n @ l, ptr l3) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
+fun zmq_msg_data {n:nat} (msg: &zmq_msg_t (n,null) >> zmq_msg_t (n,l)): #[l:agz] (bytes n @ l, (bytes n @ l, &zmq_msg_t (n,l) >> zmq_msg_t (n, null)) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
 
-fun zmq_msg_size {n:nat} (msg: &zmq_msg_t >> zmq_msg_t n): size_t n = "mac#zmq_msg_size"
+(*
+TODO: msg_data call for when we've already got an active zmq_msg_data result. Not sure how to combine this and zmq_msg_data
+fun zmq_msg_data_notnull {n:nat} {l:addr | l <> null} (msg: &zmq_msg_t (n,l) >> zmq_msg_t (n,l)): (bytes n @ l, (bytes n @ l, zmq_msg_t (n,l)) -<lin,prf> void | ptr l) = "mac#zmq_msg_data"
+*)
+
+fun zmq_msg_size {n:nat} {l:addr} (msg: &zmq_msg_t (n,l) >> zmq_msg_t (n2,l)): #[n2:nat] size_t n2 = "mac#zmq_msg_size"
 
 abst@ype zmqsockettype = $extype "int"
 macdef ZMQ_PAIR = $extval (zmqsockettype, "ZMQ_PAIR")
@@ -110,7 +130,7 @@ fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsoc
 fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bind"
 fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_connect"
 
-fun zmq_send {l:agz} (socket: !zmqsocket l, msg: &zmq_msg_t >> zmq_msg_t?, flags: int): int = "mac#zmq_send"
-fun zmq_recv {l:agz} (socket: !zmqsocket l, msg: &zmq_msg_t, flags: int): int = "mac#zmq_recv"
+fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?, flags: int): int = "mac#zmq_send"
+fun zmq_recv {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), flags: int): #[l3:agz] #[n2:nat] int = "mac#zmq_recv"
 
 
