@@ -47,7 +47,7 @@ implement main () = {
 
     (* Send message to all subscribers *)
     val update = sprintf ("%05d %d %d", @(zipcode, temperature, relhumidity));
-    val _ = s_send (p, castvwtp1 {string} (update));
+    val r = s_send (p, castvwtp1 {string} (update));
     val () = strptr_free (update)
   in
     loop (p)

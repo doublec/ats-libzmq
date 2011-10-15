@@ -3,4 +3,5 @@ TEST/hwserver
 TEST/hwclient
 TEST/version
 TEST/wuserver
+TEST/wuclient
 *_dats.c
