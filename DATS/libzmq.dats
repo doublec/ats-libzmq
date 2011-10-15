@@ -18,8 +18,6 @@ staload "libc/SATS/string.sats"
 
 #define ATS_DYNLOADFLAG 0 // no need for dynloading at run-time
 
-extern castfn strptr_of_string {n:nat} (x: string n):<> [l:agz] strptr l
-
 implement s_send (socket, s) = let
   var message: zmq_msg_t?
   val s = string1_of_string (s)
@@ -44,18 +42,14 @@ implement s_recv (socket) = let
   val size = zmq_msg_size (message)
   val (pf_data, fpf_data | p_data) = zmq_msg_data (message)
 
-  val str = string_make_char (size, 'X')
-  val str = string_of_strbuf (str)
-  val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (str)
-
+  val (pfgc, pf_bytes | p_bytes) = malloc_gc (size+1)
+  prval pf_bytes = bytes_v_of_b0ytes_v (pf_bytes)
   val _ = memcpy (pf_bytes | p_bytes, !p_data, size)
-
+  val () = bytes_strbuf_trans (pf_bytes | p_bytes, size)
   prval () = fpf_data (pf_data, message)
-  prval () = fpf_bytes (pf_bytes)
-
   val _ = zmq_msg_close (message)
 in
-  strptr_of_string (str) 
+  strptr_of_strbuf @(pfgc, pf_bytes | p_bytes)
 end
 
 
