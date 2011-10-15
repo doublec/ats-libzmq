@@ -139,4 +139,9 @@ fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq
 fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?, flags: int): int = "mac#zmq_send"
 fun zmq_recv {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), flags: int): #[l3:agz] #[n2:nat] int = "mac#zmq_recv"
 
+(* Higher level helper functions *)
+castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, bytes (n) @ l -<lin,prf> void | ptr l)
+
+fun s_send {l:agz} (socket: !zmqsocket l, s: string): int
+fun s_recv {l:agz} (socket: !zmqsocket l): [l2:agz] strptr l2
 
