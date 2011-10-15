@@ -17,7 +17,8 @@ compall: \
   hwclient \
   version \
   wuserver \
-  wuclient
+  wuclient \
+  taskvent
 
 ######
 
@@ -36,6 +37,9 @@ wuserver: wuserver.dats
 wuclient: wuclient.dats
 	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
 
+taskvent: taskvent.dats
+	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+
 ######
 
 clean:
@@ -47,5 +51,6 @@ cleanall: clean
 	rm -f version
 	rm -f wuserver
 	rm -f wuclient
+	rm -f taskvent
 
 ###### end of [Makefile] ######

@@ -4,4 +4,5 @@ TEST/hwclient
 TEST/version
 TEST/wuserver
 TEST/wuclient
+TEST/taskvent
 *_dats.c
