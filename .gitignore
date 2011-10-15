@@ -2,4 +2,5 @@
 TEST/hwserver
 TEST/hwclient
 TEST/version
+TEST/wuserver
 *_dats.c
