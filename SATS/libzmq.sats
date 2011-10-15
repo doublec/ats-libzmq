@@ -19,6 +19,12 @@
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
+abst@ype zmqversiontype = $extype "int"
+macdef ZMQ_VERSION_MAJOR = $extval (zmqversiontype, "ZMQ_VERSION_MAJOR")
+macdef ZMQ_VERSION_MINOR = $extval (zmqversiontype, "ZMQ_VERSION_MINOR")
+macdef ZMQ_VERSION_PATCH = $extval (zmqversiontype, "ZMQ_VERSION_PATCH")
+
+fun zmq_version (major: &int? >> int, minor: &int? >> int, patch: &int? >> int): void = "mac#zmq_version"
 
 (*
    zmq_msg_t has the size, 'n', and the internal data pointer, 'data' as parameters.

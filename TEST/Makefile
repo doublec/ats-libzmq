@@ -14,7 +14,8 @@ checkall: compall cleanall
 
 compall: \
   hwserver \
-  hwclient
+  hwclient \
+  version
 
 ######
 
@@ -22,6 +23,9 @@ hwserver: hwserver.dats
 	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
 
 hwclient: hwclient.dats
+	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+
+version: version.dats
 	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
 
 
@@ -33,5 +37,6 @@ clean:
 cleanall: clean
 	rm -f hwserver
 	rm -f hwclient
+	rm -f version
 
 ###### end of [Makefile] ######
