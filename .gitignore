@@ -5,4 +5,5 @@ TEST/version
 TEST/wuserver
 TEST/wuclient
 TEST/taskvent
+TEST/taskwork
 *_dats.c
