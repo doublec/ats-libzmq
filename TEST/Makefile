@@ -19,7 +19,8 @@ compall: \
   wuserver \
   wuclient \
   taskvent \
-  taskwork
+  taskwork \
+  tasksink
 
 ######
 
@@ -44,6 +45,9 @@ taskvent: taskvent.dats
 taskwork: taskwork.dats
 	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
 
+tasksink: tasksink.dats
+	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+
 ######
 
 clean:
@@ -57,5 +61,6 @@ cleanall: clean
 	rm -f wuclient
 	rm -f taskvent
 	rm -f taskwork
+	rm -f tasksink
 
 ###### end of [Makefile] ######

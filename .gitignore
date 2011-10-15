@@ -6,4 +6,5 @@ TEST/wuserver
 TEST/wuclient
 TEST/taskvent
 TEST/taskwork
+TEST/tasksink
 *_dats.c
