@@ -31,7 +31,6 @@ Some items that remain to be done or are worth looking into:
    for this case. Is there a better way of doing this?
 8. Statically ensure return values of functions are checked. Related to (1).
    (Done for zmq_msg functions)
-9. There is no static checking to ensure zmq_msg_close is called on an initialized message.
 
 Build
 =====

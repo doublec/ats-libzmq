@@ -41,13 +41,17 @@ fun zmq_version (major: &int? >> int, minor: &int? >> int, patch: &int? >> int):
 abst@ype zmq_msg_t (n:int, data:addr) = $extype "zmq_msg_t"
 typedef zmq_msg_t = zmq_msg_t (0, null)
 
+(* Proof returned by zmq_msg_init functions to ensure that zmq_close is called on an
+   initialized message *)
+absview zmq_msg_v 
+
 (*
 TODO: get this and zmq_init_data working
 typedef zmq_free_fn = {l:agz} {l2:addr} (data: ptr l, hint: ptr l2) -> void
 *)
 
-fun zmq_msg_init (msg: &zmq_msg_t? >> opt(zmq_msg_t, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_init"
-fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t? >> opt (zmq_msg_t (n, null), r == 0), size: size_t n): #[r:zmqresult] int r = "mac#zmq_msg_init_size"
+fun zmq_msg_init (msg: &zmq_msg_t? >> opt(zmq_msg_t, r == 0)): #[r:zmqresult] (option_v (zmq_msg_v, r == 0) | int r) = "mac#zmq_msg_init"
+fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t? >> opt (zmq_msg_t (n, null), r == 0), size: size_t n): #[r:zmqresult] (option_v (zmq_msg_v, r == 0) | int r) = "mac#zmq_msg_init_size"
 
 (*
 TODO: 
@@ -59,12 +63,15 @@ ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
          But there's no way of handling failure anyway since you can't close. The types actually prevent the
          only source of failure (invalid message) so maybe just an assert on error is fine.
 *)
-fun zmq_msg_close {n:nat} (msg: &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null)?, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_close"
+fun zmq_msg_close {n:nat} (pf: !zmq_msg_v >> option_v (zmq_msg_v, r == ~1) | msg: &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null)?, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_close"
+
+(* TODO: Handle zmq_msg_v in move *)
 fun zmq_msg_move {n,n2:nat} (dest: &zmq_msg_t (n, null) >> opt(zmq_msg_t (n2, null), r == 0),
                              src: &zmq_msg_t (n2, null) >> opt(zmq_msg_t (0, null)?, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_move"
 
 (* TODO: How to express the constraint from http://api.zeromq.org/2-1:zmq-msg-copy:
          "Avoid modifying message content after a message has been copied with zmq_msg_copy(), doing so can result in undefined behaviour. "
+   TODO: Handle zmq_msg_v in copy
 *)
 fun zmq_msg_copy {n,n2:nat} (dest: &zmq_msg_t (n,null) >> opt (zmq_msg_t (n2, null), r == 0), src: &zmq_msg_t (n2, null)): #[r:zmqresult] int r = "mac#zmq_msg_copy"
 

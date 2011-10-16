@@ -16,11 +16,12 @@ implement main () = {
     else let
       var request: zmq_msg_t?
       val s = string1_of_string ("Hello")
-      val r = zmq_msg_init_size (request, string1_length(s))
+      val (pf_request | r) = zmq_msg_init_size (request, string1_length(s))
       val () = assertloc (r = 0)
       prval () = opt_unsome (request)
-      val (pf_data, fpf_data | p_data) = zmq_msg_data (request)
+      prval () = pf_request := option_v_unsome (pf_request)
 
+      val (pf_data, fpf_data | p_data) = zmq_msg_data (request)
       val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
       val _ = memcpy (pf_data | p_data, !p_bytes, string1_length(s))
       prval () = fpf_bytes(pf_bytes)
@@ -28,18 +29,24 @@ implement main () = {
 
       val () = printf("Sending Hello %d...\n", @(n))
       val _ = zmq_send (requester, request, 0)
+      val r = zmq_msg_close (pf_request | request)
+      val () = assertloc (r = 0)
+      prval () = opt_unsome (request)
+      prval () = option_v_unnone (pf_request)
 
       var reply: zmq_msg_t?
-      val r = zmq_msg_init (reply)
+      val (pf_reply | r) = zmq_msg_init (reply)
       val () = assertloc (r = 0)
       prval () = opt_unsome (reply)
+      prval () = pf_reply := option_v_unsome (pf_reply)
 
       val _ = zmq_recv (requester, reply, 0)
 
       val () = printf("Received World %d\n", @(n))
-      val r = zmq_msg_close (reply)
+      val r = zmq_msg_close (pf_reply | reply)
       val () = assertloc (r = 0)
       prval () = opt_unsome (reply)
+      prval () = option_v_unnone (pf_reply)
     in
       loop_requests (requester, n + 1, max)
     end
