@@ -1,12 +1,12 @@
 Overview
 ========
 
-This is an (ATS)[http://zguide.zeromq.org/page:all] wrapper for the
-(0MQ library)[http://zeromq.org]. The wrapper is low level
+This is an [ATS](http://zguide.zeromq.org/page:all) wrapper for the
+[0MQ library](http://zeromq.org). The wrapper is low level
 in that it wraps the C API and can be used in the same way. It includes
 ATS types to ensure that unsafe use of the library are compile time errors.
 
-The (0MQ Guide)[http://zguide.zeromq.org/page:all] has a number of
+The [0MQ Guide](http://zguide.zeromq.org/page:all) has a number of
 examples in C. Some of these are converted
 to ATS in the TEST subdirectory. They have the same filename as the C 
 versions but with '.dats' as the file extension. I'm working on converting
