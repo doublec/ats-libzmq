@@ -20,13 +20,18 @@ implement main () = {
 
   val _ = zmq_bind (responder, "tcp://*:5555")
 
-  fun loop {l:agz} (r: !zmqsocket l): void = let
+  fun loop {l:agz} (responder: !zmqsocket l): void = let
     (* Wait for next request from client *)
     var request: zmq_msg_t?
-    val _ = zmq_msg_init (request)
-    val _ = zmq_recv (r, request, 0)
+    val r = zmq_msg_init (request)
+    val () = assertloc (r = 0)
+    prval () = opt_unsome (request)
+
+    val _ = zmq_recv (responder, request, 0)
     val () = print_string("Received Hello\n")
-    val _ = zmq_msg_close (request)
+    val r = zmq_msg_close (request)
+    val () = assertloc (r = 0)
+    prval () = opt_unsome (request) 
  
     (* Do some work *)
     val _ = sleep(1)
@@ -34,7 +39,9 @@ implement main () = {
     (* Send reply back to client *)
     var reply: zmq_msg_t?
     val s = string1_of_string ("World")
-    val _ = zmq_msg_init_size (reply, string1_length (s))
+    val r = zmq_msg_init_size (reply, string1_length (s))
+    val () = assertloc (r = 0)
+    prval () = opt_unsome (reply)
     val (pf_data, fpf_data | p_data) = zmq_msg_data (reply)
     val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
     val _ = memcpy (pf_data | p_data, !p_bytes, string1_length(s))
@@ -42,9 +49,9 @@ implement main () = {
     prval () = fpf_bytes(pf_bytes)
     prval () = fpf_data(pf_data, reply)
 
-    val _ = zmq_send (r, reply, 0);
+    val _ = zmq_send (responder, reply, 0);
   in
-    loop (r)
+    loop (responder)
   end 
 
   val () = loop (responder)

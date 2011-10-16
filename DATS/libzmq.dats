@@ -22,20 +22,28 @@ implement s_send (socket, s) = let
   var message: zmq_msg_t?
   val s = string1_of_string (s)
   val size = string1_length (s)
-  val _ = zmq_msg_init_size (message, size)
+
+  val r = zmq_msg_init_size (message, size)
+  val () = assertloc (r = 0)
+  prval () = opt_unsome (message)
+
   val (pf_data, fpf_data | p_data) = zmq_msg_data (message)
   val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
   val _ = memcpy (pf_data | p_data, !p_bytes, size)
   prval () = fpf_data (pf_data, message)
   prval () = fpf_bytes (pf_bytes)
-  val r = zmq_send (socket, message, 0)
+  val _ = zmq_send (socket, message, 0)
+  (* TODO: if zmq_send failed, does the message need to be zmq_closed? *)
 in
   r
 end
 
 implement s_recv (socket) = let
   var message: zmq_msg_t?
-  val _ = zmq_msg_init (message)
+  val r = zmq_msg_init (message)
+  val () = assertloc (r = 0)
+  prval () = opt_unsome (message)
+
   val r = zmq_recv (socket, message, 0)
   val () = assert_errmsg(r = 0, "zmq_recv failed")
 
@@ -47,7 +55,9 @@ implement s_recv (socket) = let
   val _ = memcpy (pf_bytes | p_bytes, !p_data, size)
   val () = bytes_strbuf_trans (pf_bytes | p_bytes, size)
   prval () = fpf_data (pf_data, message)
-  val _ = zmq_msg_close (message)
+  val r = zmq_msg_close (message)
+  val () = assertloc (r = 0)
+  prval () = opt_unsome (message)
 in
   strptr_of_strbuf @(pfgc, pf_bytes | p_bytes)
 end

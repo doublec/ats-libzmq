@@ -10,13 +10,15 @@ staload "libc/SATS/string.sats"
 extern castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, bytes (n) @ l -<lin,prf> void | ptr l)
 
 implement main () = {
-  fun loop_requests {l:agz} {n,m:nat | m >= n} .< m-n >. (r: !zmqsocket l, n: int n, max: int m): void =
+  fun loop_requests {l:agz} {n,m:nat | m >= n} .< m-n >. (requester: !zmqsocket l, n: int n, max: int m): void =
     if n = max then
       ()
     else let
       var request: zmq_msg_t?
       val s = string1_of_string ("Hello")
-      val _ = zmq_msg_init_size (request, string1_length(s))
+      val r = zmq_msg_init_size (request, string1_length(s))
+      val () = assertloc (r = 0)
+      prval () = opt_unsome (request)
       val (pf_data, fpf_data | p_data) = zmq_msg_data (request)
 
       val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
@@ -25,16 +27,21 @@ implement main () = {
       prval () = fpf_data(pf_data, request)
 
       val () = printf("Sending Hello %d...\n", @(n))
-      val _ = zmq_send (r, request, 0)
+      val _ = zmq_send (requester, request, 0)
 
       var reply: zmq_msg_t?
-      val _ = zmq_msg_init (reply)
-      val _ = zmq_recv (r, reply, 0)
+      val r = zmq_msg_init (reply)
+      val () = assertloc (r = 0)
+      prval () = opt_unsome (reply)
+
+      val _ = zmq_recv (requester, reply, 0)
 
       val () = printf("Received World %d\n", @(n))
-      val _ = zmq_msg_close (reply)
+      val r = zmq_msg_close (reply)
+      val () = assertloc (r = 0)
+      prval () = opt_unsome (reply)
     in
-      loop_requests (r, n + 1, max)
+      loop_requests (requester, n + 1, max)
     end
 
   val context = zmq_init (1)

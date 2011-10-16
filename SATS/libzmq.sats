@@ -19,6 +19,9 @@
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
+(* ZMQ functions return 0 on success, -1 on error *)
+sortdef zmqresult = {a:int | a == 0 || a == ~1}
+
 abst@ype zmqversiontype = $extype "int"
 macdef ZMQ_VERSION_MAJOR = $extval (zmqversiontype, "ZMQ_VERSION_MAJOR")
 macdef ZMQ_VERSION_MINOR = $extval (zmqversiontype, "ZMQ_VERSION_MINOR")
@@ -43,8 +46,8 @@ TODO: get this and zmq_init_data working
 typedef zmq_free_fn = {l:agz} {l2:addr} (data: ptr l, hint: ptr l2) -> void
 *)
 
-fun zmq_msg_init (msg: &zmq_msg_t? >> zmq_msg_t): int = "mac#zmq_msg_init"
-fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t? >> zmq_msg_t (n, null), size: size_t n): int = "mac#zmq_msg_init_size"
+fun zmq_msg_init (msg: &zmq_msg_t? >> opt(zmq_msg_t, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_init"
+fun zmq_msg_init_size {n:nat} (msg: &zmq_msg_t? >> opt (zmq_msg_t (n, null), r == 0), size: size_t n): #[r:zmqresult] int r = "mac#zmq_msg_init_size"
 
 (*
 TODO: 
@@ -52,13 +55,18 @@ ZMQ_EXPORT int zmq_msg_init_data (zmq_msg_t *msg, void *data,
     size_t size, zmq_free_fn *ffn, void *hint);
 *)
 
-fun zmq_msg_close {n:nat} (msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?): int = "mac#zmq_msg_close"
-fun zmq_msg_move {n,n2:nat} (dest: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), src: &zmq_msg_t (n2, null) >> zmq_msg_t (0, null)?): int = "mac#zmq_msg_move"
+(* TODO: 'opt' here is problematic. If the close fails then opt_unnone sets an unintialized type so can't retry.
+         But there's no way of handling failure anyway since you can't close. The types actually prevent the
+         only source of failure (invalid message) so maybe just an assert on error is fine.
+*)
+fun zmq_msg_close {n:nat} (msg: &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null)?, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_close"
+fun zmq_msg_move {n,n2:nat} (dest: &zmq_msg_t (n, null) >> opt(zmq_msg_t (n2, null), r == 0),
+                             src: &zmq_msg_t (n2, null) >> opt(zmq_msg_t (0, null)?, r == 0)): #[r:zmqresult] int r = "mac#zmq_msg_move"
 
 (* TODO: How to express the constraint from http://api.zeromq.org/2-1:zmq-msg-copy:
          "Avoid modifying message content after a message has been copied with zmq_msg_copy(), doing so can result in undefined behaviour. "
 *)
-fun zmq_msg_copy {n,n2:nat} (dest: &zmq_msg_t (n,null) >> zmq_msg_t (n2, null), src: &zmq_msg_t (n2, null)): int = "mac#zmq_msg_copy"
+fun zmq_msg_copy {n,n2:nat} (dest: &zmq_msg_t (n,null) >> opt (zmq_msg_t (n2, null), r == 0), src: &zmq_msg_t (n2, null)): #[r:zmqresult] int r = "mac#zmq_msg_copy"
 
 (* The returned pointer is internal to the 'msg' object. The returned proof function takes this
    'msg' as a parameter to ensure that it cannot be destroyed while the data pointer
@@ -146,8 +154,16 @@ fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsoc
 fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bind"
 fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_connect"
 
-fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?, flags: int): int = "mac#zmq_send"
-fun zmq_recv {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), flags: int): #[l3:agz] #[n2:nat] int = "mac#zmq_recv"
+(* TODO: Can't use 'opt' for return checking of the 'msg'. The following has issues:
+           &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null)?, r == 0)
+         If the result is an error, then the zmq_msg_t is still initialized but opt_unnone sets an unintialized type.
+         Might need a custom type?
+*)
+fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?, flags: int): [r:zmqresult] int r = "mac#zmq_send"
+
+(* TODO: Another use of 'opt' being problematic. On failure the type returned by 'opt' is uninitialized, whereas it needs to
+         be the original type to allow retrying. *)
+fun zmq_recv {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (n2, null), flags: int): #[l3:agz] #[n2:nat] [r:zmqresult] int r = "mac#zmq_recv"
 
 (* Higher level helper functions *)
 castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, bytes (n) @ l -<lin,prf> void | ptr l)
