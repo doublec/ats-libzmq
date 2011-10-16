@@ -32,10 +32,12 @@ implement s_send (socket, s) = let
   val _ = memcpy (pf_data | p_data, !p_bytes, size)
   prval () = fpf_data (pf_data, message)
   prval () = fpf_bytes (pf_bytes)
-  val _ = zmq_send (socket, message, 0)
-  (* TODO: if zmq_send failed, does the message need to be zmq_closed? *)
+  val result = zmq_send (socket, message, 0)
+  val r = zmq_msg_close (message)
+  val () = assertloc (r = 0)
+  prval () = opt_unsome (message)
 in
-  r
+  result
 end
 
 implement s_recv (socket) = let

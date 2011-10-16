@@ -155,11 +155,11 @@ fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bi
 fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_connect"
 
 (* TODO: Can't use 'opt' for return checking of the 'msg'. The following has issues:
-           &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null)?, r == 0)
+           &zmq_msg_t (n, null) >> opt(zmq_msg_t (0, null), r == 0)
          If the result is an error, then the zmq_msg_t is still initialized but opt_unnone sets an unintialized type.
          Might need a custom type?
 *)
-fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null)?, flags: int): [r:zmqresult] int r = "mac#zmq_send"
+fun zmq_send {l:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (n, null) >> zmq_msg_t (0, null), flags: int): [r:zmqresult] int r = "mac#zmq_send"
 
 (* TODO: Another use of 'opt' being problematic. On failure the type returned by 'opt' is uninitialized, whereas it needs to
          be the original type to allow retrying. *)
