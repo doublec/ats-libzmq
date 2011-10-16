@@ -120,6 +120,16 @@ castfn zmqcontext_free_null (p: zmqcontext null):<> ptr null
 overload ~ with zmqcontext_isnot_null
 
 fun zmq_init {n:nat} (io_threads: int n): [l:addr] zmqcontext l = "mac#zmq_init"
+
+(* TODO: Is it possible to encode this constraint from the 0MQ programming guide:
+   "...if you have any outgoing messages or connects waiting on a socket, 2.1 will
+    by default wait forever trying to deliver these. You must set the LINGER socket
+    option (e.g. to zero), on every socket which may still be busy, before calling zmq_term:
+
+      int zero = 0;
+      zmq_setsockopt (mysocket, ZMQ_LINGER, &zero, sizeof (zero));
+   "
+*)
 fun zmq_term {l:agz} (context: zmqcontext l): int = "mac#zmq_term"
 
 absviewtype zmqsocket (l:addr)
