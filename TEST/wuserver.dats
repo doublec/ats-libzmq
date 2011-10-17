@@ -10,10 +10,10 @@ staload "prelude/SATS/unsafe.sats"
 implement main () = {
   (* Prepare our context and publisher *)
   val context = zmq_init (1)
-  val () = assert_errmsg(~context, "zmq_init failed")
+  val () = assertloc (~context)
 
   val publisher = zmq_socket (context, ZMQ_PUB)
-  val () = assert_errmsg(~publisher, "zmq_socket failed")
+  val () = assertloc (~publisher)
 
   val _ = zmq_bind (publisher, "tcp://*:5556")
   val _ = zmq_bind (publisher, "ipc://weather.ipc")

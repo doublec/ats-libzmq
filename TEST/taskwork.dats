@@ -12,16 +12,16 @@ staload "prelude/SATS/unsafe.sats"
 
 implement main () = {
   val context = zmq_init (1)
-  val () = assert_errmsg (~context, #LOCATION)
+  val () = assertloc (~context)
 
   (*  Socket to receive messages on *)
   val receiver = zmq_socket (context, ZMQ_PULL)
-  val () = assert_errmsg (~receiver, #LOCATION)
+  val () = assertloc (~receiver)
   val _ = zmq_connect (receiver, "tcp://localhost:5557")
 
   (*  Socket to send messages to *)
   val sender = zmq_socket (context, ZMQ_PUSH)
-  val () = assert_errmsg (~sender, #LOCATION)
+  val () = assertloc (~sender)
   val _ = zmq_connect (sender, "tcp://localhost:5558")
 
   (*  Process tasks forever *)

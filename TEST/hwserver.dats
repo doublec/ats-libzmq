@@ -12,11 +12,11 @@ extern castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, b
 
 implement main () = {
   val context = zmq_init (1)
-  val () = assert_errmsg(~context, "zmq_init failed")
+  val () = assertloc (~context)
 
   (*  Socket to talk to clients *)
   val responder = zmq_socket (context, ZMQ_REP)
-  val () = assert_errmsg(~responder, "zmq_socket failed")
+  val () = assertloc (~responder)
 
   val _ = zmq_bind (responder, "tcp://*:5555")
 

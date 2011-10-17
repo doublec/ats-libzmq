@@ -11,16 +11,16 @@ staload "prelude/SATS/unsafe.sats"
 
 implement main () = {
   val context = zmq_init (1)
-  val () = assert_errmsg (~context, #LOCATION)
+  val () = assertloc (~context)
 
   (*  Socket to send messages on *)
   val sender = zmq_socket (context, ZMQ_PUSH)
-  val () = assert_errmsg (~sender, #LOCATION)
+  val () = assertloc (~sender)
   val _ = zmq_bind (sender, "tcp://*:5557")
 
   (*  Socket to send start of batch message on *)
   val sink = zmq_socket (context, ZMQ_PUSH)
-  val () = assert_errmsg (~sink, #LOCATION)
+  val () = assertloc (~sink)
   val _ = zmq_connect (sink, "tcp://localhost:5558")
 
   val () = print_string ("Press Enter when the workers are ready: ")

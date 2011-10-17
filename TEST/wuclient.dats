@@ -9,12 +9,12 @@ extern castfn ptr_of_string (x: string):<> [l:agz] ptr l
 
 implement main (argc, argv) = {
   val context = zmq_init (1)
-  val () = assert_errmsg (~context, "zmq_init failed")
+  val () = assertloc (~context)
 
   (* Socket to talk to server *)
   val () = print_string ("Collecting updates from weather server...\n")
   val subscriber = zmq_socket (context, ZMQ_SUB)
-  val () = assert_errmsg (~subscriber, #LOCATION)
+  val () = assertloc (~subscriber)
   val _ = zmq_connect (subscriber, "tcp://localhost:5556")
 
   (* Subscribe to zipcode, default is NYC, 10001 *)

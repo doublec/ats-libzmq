@@ -11,7 +11,7 @@ staload "libc/SATS/stdio.sats"
 fun s_clock (): double = let
   var tv: timeval?
   val r = gettimeofday (tv)
-  val () = assert_errmsg(r = 0, #LOCATION)
+  val () = assertloc (r = 0)
   prval () = opt_unsome {timeval} (tv)
 in
   double_of (lint_of (tv.tv_sec) * 1000L + lint_of(tv.tv_usec) / 1000L)
@@ -20,10 +20,10 @@ end
 implement main () = { 
     (*  Prepare our context and socket *)
     val context = zmq_init (1)
-    val () = assert_errmsg (~context, #LOCATION)
+    val () = assertloc (~context)
 
     val receiver = zmq_socket (context, ZMQ_PULL)
-    val () = assert_errmsg (~receiver, #LOCATION)
+    val () = assertloc (~receiver)
 
     val _ = zmq_bind (receiver, "tcp://*:5558")
 

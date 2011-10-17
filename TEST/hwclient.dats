@@ -47,12 +47,12 @@ implement main () = {
     end
 
   val context = zmq_init (1)
-  val () = assert_errmsg(~context, "zmq_init failed")
+  val () = assertloc (~context)
 
   (*  Socket to talk to server *)
   val () = print_string ("Connecting to hello world server...\n");
   val requester = zmq_socket(context, ZMQ_REQ)
-  val () = assert_errmsg(~requester, "zmq_socket failed")
+  val () = assertloc (~requester)
 
   val _ = zmq_connect (requester, "tcp://localhost:5555")
   val () = loop_requests (requester, 0, 10)
