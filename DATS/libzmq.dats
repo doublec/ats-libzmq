@@ -19,51 +19,45 @@ staload "libc/SATS/string.sats"
 #define ATS_DYNLOADFLAG 0 // no need for dynloading at run-time
 
 implement s_send (socket, s) = let
-  var message: zmq_msg_t?
+  var message: zmq_msg_t with pf_message
   val s = string1_of_string (s)
   val size = string1_length (s)
 
-  val (pf_msg | r) = zmq_msg_init_size (message, size)
+  val r = zmq_msg_init_size (pf_message | &message, size)
   val () = assertloc (r = 0)
-  prval () = opt_unsome (message)
-  prval () = pf_msg := option_v_unsome (pf_msg)
 
-  val (pf_data, fpf_data | p_data) = zmq_msg_data (message)
+  val (pf_data, fpf_data | p_data) = zmq_msg_data (pf_message | &message)
   val (pf_bytes, fpf_bytes | p_bytes) = bytes_of_string (s)
   val _ = memcpy (pf_data | p_data, !p_bytes, size)
-  prval () = fpf_data (pf_data, message)
+  prval () = fpf_data (pf_data, pf_message)
   prval () = fpf_bytes (pf_bytes)
-  val result = zmq_send (socket, message, 0)
-  val r = zmq_msg_close (pf_msg | message)
+
+  val result = zmq_send (pf_message | socket, &message, 0)
+  val r = zmq_msg_close (pf_message | &message)
   val () = assertloc (r = 0)
-  prval () = opt_unsome (message) 
-  prval () = option_v_unnone (pf_msg)
 in
   result
 end
 
 implement s_recv (socket) = let
-  var message: zmq_msg_t?
-  val (pf_msg | r) = zmq_msg_init (message)
+  var message: zmq_msg_t with pf_message
+  val r = zmq_msg_init (pf_message | &message)
   val () = assertloc (r = 0)
-  prval () = opt_unsome (message)
-  prval () = pf_msg := option_v_unsome (pf_msg)
 
-  val r = zmq_recv (socket, message, 0)
-  val () = assert_errmsg(r = 0, "zmq_recv failed")
+  val r = zmq_recv (pf_message | socket, &message, 0)
+  val () = assertloc (r = 0)
 
-  val size = zmq_msg_size (message)
-  val (pf_data, fpf_data | p_data) = zmq_msg_data (message)
+  val size = zmq_msg_size (pf_message | &message)
+  val (pf_data, fpf_data | p_data) = zmq_msg_data (pf_message | &message)
 
   val (pfgc, pf_bytes | p_bytes) = malloc_gc (size+1)
   prval pf_bytes = bytes_v_of_b0ytes_v (pf_bytes)
   val _ = memcpy (pf_bytes | p_bytes, !p_data, size)
   val () = bytes_strbuf_trans (pf_bytes | p_bytes, size)
-  prval () = fpf_data (pf_data, message)
-  val r = zmq_msg_close (pf_msg | message)
+  prval () = fpf_data (pf_data, pf_message)
+
+  val r = zmq_msg_close (pf_message | &message)
   val () = assertloc (r = 0)
-  prval () = opt_unsome (message)
-  prval () = option_v_unnone (pf_msg)
 in
   strptr_of_strbuf @(pfgc, pf_bytes | p_bytes)
 end
