@@ -27,9 +27,7 @@ Some items that remain to be done or are worth looking into:
 6. Can zmq_copy constraint be statically checked:
    "Avoid modifying message content after a message has been copied with
     zmq_msg_copy(), doing so can result in undefined behaviour."
-7. zmq_msg_data can't be called twice, there's a commented out zmq_msg_data_notnull
-   for this case. Is there a better way of doing this?
-8. Statically ensure return values of functions are checked. Related to (1).
+7. Statically ensure return values of functions are checked. Related to (1).
 
 Build
 =====
