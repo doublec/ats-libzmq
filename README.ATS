@@ -1,0 +1,16 @@
+Overview
+========
+
+The source for the ATS wrapper for the 0MQ library [1] is maintained
+on github [2].
+
+If you have 'git' installed you can retrieve the source and build by
+running 'make'. To remove the git source run 'make cleangit'.
+
+You can overide the git repostory used when running make (to use a
+fork for example) by specifying the REMOTE variable:
+
+  make REMOTE=~/mylibzmq.git
+
+[1] http://zeromq.org
+[2] http://github.com/doublec

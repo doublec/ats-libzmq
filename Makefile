@@ -18,7 +18,7 @@ all: .git atsctrb_libzmq.o clean
 ######
 
 .git:
-	rm Makefile && git clone $(REMOTE) .
+	rm Makefile README.ATS && git clone $(REMOTE) .
 
 ######
 
@@ -39,6 +39,6 @@ cleanall: clean
 	rm -f atsctrb_libzmq.o
 
 cleangit: .git
-	rm -r * && git checkout Makefile && rm -rf .git .gitignore
+	rm -r * && git checkout Makefile README.ATS && rm -rf .git .gitignore
 
 ###### end of [Makefile] ######
