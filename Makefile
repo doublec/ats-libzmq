@@ -6,14 +6,19 @@
 #
 
 ######
-
+REMOTE=http://github.com/doublec/ats-libzmq
 ATSHOMEQ="$(ATSHOME)"
 ATSCC=$(ATSHOMEQ)/bin/atscc -Wall
 JANSSONCFLAGS=`pkg-config libzmq --cflags`
 
 ######
 
-all: atsctrb_libzmq.o clean
+all: .git atsctrb_libzmq.o clean
+
+######
+
+.git:
+	rm Makefile && git clone $(REMOTE) .
 
 ######
 
@@ -32,5 +37,8 @@ clean::
 
 cleanall: clean
 	rm -f atsctrb_libzmq.o
+
+cleangit: .git
+	rm -r * && git checkout Makefile && rm -rf .git .gitignore
 
 ###### end of [Makefile] ######
