@@ -7,4 +7,5 @@ TEST/wuclient
 TEST/taskvent
 TEST/taskwork
 TEST/tasksink
+TEST/msreader
 *_dats.c

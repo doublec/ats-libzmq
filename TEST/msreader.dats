@@ -33,48 +33,34 @@ implement main () = {
     (*  Process messages from both sockets
         We prioritize traffic from the task ventilator *)
     val () = loop (receiver, subscriber) where {
-               fun {l,l2:agz} loop (receiver: !zmqsocket l, subscriber: !zmqsocket l2):void = {
-                 (*  Process any waiting tasks *)
-                 val () = while_ok (receiver, 0) where {
-                            fun while_ok {l:agz} {r:zmqresult} (receiver: !zmqsocket l, r: int r): void = 
-                              if r = 0 then {
-                                var task: zmq_msg_t
-                                val r = zmq_msg_init (task)
-                                val () = assertloc (r = 0)
-                              
-                                val rc = zmq_recv (receiver, task, zmqsendrecvflag_to_int (ZMQ_NOBLOCK))
-                                val () = if rc = 0 then printf("process task\n", @())
-                              
-                                val r = zmq_msg_close (task)
-                                val () = assertloc (r = 0)
+               typedef callback = {l:agz} {n:nat} (&zmq_msg_t (l, n)) -> void
 
-                                val () = while_ok (receiver, rc)
-                              }
-                              else ()
-                          }
+               fun while_ok {l:agz} {r:zmqresult} (socket: !zmqsocket l, r: int r, f: callback): void = 
+                 if r = 0 then {
+                   var msg: zmq_msg_t
+                   val r = zmq_msg_init (msg)
+                   val () = assertloc (r = 0)
+                              
+                   val rc = zmq_recv (socket, msg, zmqsendrecvflag_to_int (ZMQ_NOBLOCK))
+                   val () = if :(msg: [l:agz] [n:nat] zmq_msg_t (l, n)) => rc = 0 then f(msg) 
+                              
+                   val r = zmq_msg_close (msg)
+                   val () = assertloc (r = 0)
+
+                   val () = while_ok (socket, rc, f)
+                 }
+                 else ()
+
+               fun loop {l,l2:agz} (receiver: !zmqsocket l, subscriber: !zmqsocket l2):void = {
+               
+                 (*  Process any waiting tasks *)
+                 val () = while_ok (receiver, 0, lam (msg) => print_string ("process task\n"))
 
                  (*  Process any waiting weather updates *)
-                 val () = while_ok (subscriber, 0) where {
-                            fun while_ok {l:agz} {r:zmqresult} (subscriber: !zmqsocket l, r: int r): void = 
-                              if r = 0 then {
-                                var update: zmq_msg_t
-                                val r = zmq_msg_init (update)
-                                val () = assertloc (r = 0)
-                              
-                                val rc = zmq_recv (subscriber, update, zmqsendrecvflag_to_int (ZMQ_NOBLOCK))
-                                val () = if rc = 0 then printf("process weather update\n", @())
-                              
-                                val r = zmq_msg_close (update)
-                                val () = assertloc (r = 0)
-
-                                val () = while_ok (subscriber, rc)
-                              }
-                              else ()
-                          }
+                 val () = while_ok (subscriber, 0, lam (msg) => print_string ("process_weather_update\n"))
 
                  (*  No activity, so sleep for 1 msec *)
-                 val ms = int1_of (1)
-                 val ms = max(0, min(MILLION, ms))
+                 val ms = max(0, min(MILLION, 1)) 
                  val () = usleep (ms)
 
 
