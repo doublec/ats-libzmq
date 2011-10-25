@@ -110,6 +110,8 @@ abst@ype zmqsendrecvflag = $extype "int"
 macdef ZMQ_NOBLOCK = $extval (zmqsendrecvflag, "ZMQ_NOBLOCK")
 macdef ZMQ_SNDMORE = $extval (zmqsendrecvflag, "ZMQ_SNDMORE")
 
+castfn zmqsendrecvflag_to_int (f: zmqsendrecvflag): int 
+
 absviewtype zmqcontext (l:addr)
 fun zmqcontext_null () :<> zmqcontext (null) = "mac#atspre_null_ptr"
 fun zmqcontext_is_null {l:addr} (p: !zmqcontext l):<> bool (l==null) = "mac#atspre_ptr_is_null"

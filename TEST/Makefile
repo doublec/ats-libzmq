@@ -20,7 +20,8 @@ compall: \
   wuclient \
   taskvent \
   taskwork \
-  tasksink
+  tasksink \
+  msreader
 
 ######
 
@@ -48,6 +49,9 @@ taskwork: taskwork.dats
 tasksink: tasksink.dats
 	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
+msreader: msreader.dats
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+
 ######
 
 clean:
@@ -62,5 +66,6 @@ cleanall: clean
 	rm -f taskvent
 	rm -f taskwork
 	rm -f tasksink
+	rm -f msreader
 
 ###### end of [Makefile] ######
