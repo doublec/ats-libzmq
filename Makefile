@@ -9,7 +9,7 @@
 REMOTE=http://github.com/doublec/ats-libzmq
 ATSHOMEQ="$(ATSHOME)"
 ATSCC=$(ATSHOMEQ)/bin/atscc -Wall
-JANSSONCFLAGS=`pkg-config libzmq --cflags`
+CFLAGS=`pkg-config libzmq --cflags`
 
 ######
 
@@ -28,7 +28,7 @@ atsctrb_libzmq.o: libzmq_dats.o
 ######
 
 libzmq_dats.o: DATS/libzmq.dats
-	$(ATSCC) $(XRCFLAGS) -o $@ -c $<
+	$(ATSCC) $(CFLAGS) -o $@ -c $<
 
 ######
 

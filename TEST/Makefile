@@ -4,8 +4,8 @@ ATSHOMEQ="$(ATSHOME)"
 ATSCC=$(ATSHOMEQ)/bin/atscc
 ATSCTRB=\
   $(ATSHOMEQ)/contrib/libzmq/atsctrb_libzmq.o
-LIBZMQCFLAGS=`pkg-config libzmq --cflags`
-LIBZMQLIBS=`pkg-config libzmq --libs`
+CFLAGS=`pkg-config libzmq --cflags`
+LIBS=`pkg-config libzmq --libs`
 ######
 
 checkall: compall cleanall
@@ -25,28 +25,28 @@ compall: \
 ######
 
 hwserver: hwserver.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 hwclient: hwclient.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 version: version.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 wuserver: wuserver.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 wuclient: wuclient.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 taskvent: taskvent.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 taskwork: taskwork.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 tasksink: tasksink.dats
-	$(ATSCC) $(LIBZMQCFLAGS) -o $@ $< $(ATSCTRB) $(LIBZMQLIBS)
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 ######
 
