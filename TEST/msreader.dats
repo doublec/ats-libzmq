@@ -5,8 +5,6 @@
 staload "contrib/libzmq/SATS/libzmq.sats"
 staload "libc/SATS/unistd.sats"
 
-extern castfn ptr_of_string (x: string):<> [l:agz] ptr l
-
 implement main () = {
     (*  Prepare our context and sockets *)
     val context = zmq_init (1)
@@ -27,7 +25,7 @@ implement main () = {
     val () = assertloc (r = 0)
 
     val filter = "10001 "
-    val r = zmq_setsockopt (subscriber, ZMQ_SUBSCRIBE, ptr_of_string (filter), string_length (filter))
+    val r = zmq_setsockopt_string (subscriber, ZMQ_SUBSCRIBE, filter, string_length (filter))
     val () = assertloc (r = 0)
 
     (*  Process messages from both sockets

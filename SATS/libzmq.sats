@@ -141,7 +141,8 @@ overload ~ with zmqsocket_isnot_null
 
 fun zmq_socket {l:agz} (context: !zmqcontext l, type: zmqsockettype): [l2:addr] zmqsocket l2 = "mac#zmq_socket"
 fun zmq_close {l:agz} (socket: zmqsocket l): int = "mac#zmq_close"
-fun zmq_setsockopt {l:agz} {l2:addr} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t): int = "mac#zmq_setsockopt"
+fun zmq_setsockopt {a:t@ype} {l:agz} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: &a, option_len: sizeof_t a): int = "mac#zmq_setsockopt"
+fun zmq_setsockopt_string {l:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: string n, option_len: size_t n): int = "mac#zmq_setsockopt"
 fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#zmq_getsockopt"
 fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bind"
 fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_connect"

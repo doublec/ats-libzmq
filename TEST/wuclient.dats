@@ -5,8 +5,6 @@
 *)
 staload "contrib/libzmq/SATS/libzmq.sats"
 
-extern castfn ptr_of_string (x: string):<> [l:agz] ptr l
-
 implement main (argc, argv) = {
   val context = zmq_init (1)
   val () = assertloc (~context)
@@ -18,8 +16,8 @@ implement main (argc, argv) = {
   val _ = zmq_connect (subscriber, "tcp://localhost:5556")
 
   (* Subscribe to zipcode, default is NYC, 10001 *)
-  val filter = if argc > 1 then argv.[1] else "10001 "
-  val r = zmq_setsockopt (subscriber, ZMQ_SUBSCRIBE, ptr_of_string (filter), string_length (filter)) 
+  val filter = string1_of_string (if argc > 1 then argv.[1] else "10001 ")
+  val r = zmq_setsockopt_string (subscriber, ZMQ_SUBSCRIBE, filter, string_length (filter)) 
 
   (* Process 100 updates *)
   val update_nbr = 100
