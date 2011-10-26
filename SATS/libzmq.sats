@@ -142,6 +142,7 @@ overload ~ with zmqsocket_isnot_null
 fun zmq_socket {l:agz} (context: !zmqcontext l, type: zmqsockettype): [l2:addr] zmqsocket l2 = "mac#zmq_socket"
 fun zmq_close {l:agz} (socket: zmqsocket l): int = "mac#zmq_close"
 fun zmq_setsockopt {a:t@ype} {l:agz} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: &a, option_len: sizeof_t a): int = "mac#zmq_setsockopt"
+(* TODO: option_len can be <= option_value size *)
 fun zmq_setsockopt_string {l:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: string n, option_len: size_t n): int = "mac#zmq_setsockopt"
 fun zmq_getsockopt {l,l2:agz} {n:nat} (socket: !zmqsocket l, option_name: zmqsocketoption, option_value: ptr l2, option_len: size_t n): int = "mac#zmq_getsockopt"
 fun zmq_bind {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq_bind"
@@ -150,6 +151,24 @@ fun zmq_connect {l:agz} (socket: !zmqsocket l, endpoint: string): int = "mac#zmq
 fun zmq_send {l,l2:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (l2, n) >> zmq_msg_t (l3, 0), flags: int): #[l3:agz] [r:zmqresult] int r = "mac#zmq_send"
 
 fun zmq_recv {l,l2:agz} {n:nat} (socket: !zmqsocket l, msg: &zmq_msg_t (l2, n) >> zmq_msg_t (l3, n2), flags: int): #[l3:agz] #[n2:nat] [r:zmqresult] int r = "mac#zmq_recv"
+
+(* Polling *)
+macdef ZMQ_POLLIN = $extval (int, "ZMQ_POLLIN")
+macdef ZMQ_POLLOUT = $extval (int, "ZMQ_POLLOUT")
+macdef ZMQ_POLLERR = $extval (int, "ZMQ_POLLERR")
+
+viewtypedef zmq_pollitem_t = $extype_struct "zmq_pollitem_t" of {
+  socket= [l:addr] zmqsocket l,
+  fd= int,
+  events= sint,
+  revents= sint
+}
+
+(* TODO: nitems can be <= array size *)
+fun zmq_poll {l:agz} {n:nat} (pf_items: !array_v (zmq_pollitem_t, n, l) | items: ptr l, nitems: int n, timeout: lint): int = "mac#zmq_poll"
+
+(* Helper funtion implemented in libzmq.cats *)
+fun zmq_pollitem_init {l,l2:agz} (pf: !zmq_pollitem_t? @ l >> zmq_pollitem_t @ l | item: ptr l, s: zmqsocket l2, fd: int, events: int): void = "mac#ats_pollitem_init"
 
 (* Higher level helper functions *)
 castfn bytes_of_string {n:nat} (x: string n):<> [l:agz] (bytes (n) @ l, bytes (n) @ l -<lin,prf> void | ptr l)

@@ -8,4 +8,5 @@ TEST/taskvent
 TEST/taskwork
 TEST/tasksink
 TEST/msreader
+TEST/mspoller
 *_dats.c

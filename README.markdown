@@ -28,6 +28,8 @@ Some items that remain to be done or are worth looking into:
    "Avoid modifying message content after a message has been copied with
     zmq_msg_copy(), doing so can result in undefined behaviour."
 7. Statically ensure return values of functions are checked. Related to (1).
+8. Make zmq_poll related functions safer with regards to sharing the socket object.
+9. Clean up mspoller example
 
 Build
 =====
