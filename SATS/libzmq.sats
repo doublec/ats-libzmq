@@ -29,6 +29,9 @@ macdef ZMQ_VERSION_PATCH = $extval (zmqversiontype, "ZMQ_VERSION_PATCH")
 
 fun zmq_version (major: &int? >> int, minor: &int? >> int, patch: &int? >> int): void = "mac#zmq_version"
 
+fun zmq_errno (): int = "mac#zmq_errno"
+fun zmq_strerror (errnum: int): string = "mac#zmq_strerror"
+
 #define ZMQ_MAX_VSM_SIZE 30
 
 absviewtype zmq_msg_content_vt (l:addr, n:int)
