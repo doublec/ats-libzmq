@@ -6,13 +6,12 @@ staload "contrib/libzmq/SATS/libzmq.sats"
 staload "prelude/SATS/array.sats"
 staload "prelude/DATS/array.dats"
 
-%{^
-int check_revents(zmq_pollitem_t* pi, int flag) {
-  return pi->revents & flag;
-}
-%}
-
-extern fun check_revents {l:agz} (pf_item: !zmq_pollitem_t @ l | p_item: ptr l, flag: int): bool = "mac#check_revents"
+fun check_revents (item: &zmq_pollitem_t, flag: int16): bool = let
+  val r = uint_of_int (int_of_int16 (item.revents))
+  val f = uint_of_int (int_of_int16 (flag))
+in
+  (r land f) <> uint_of_int (0)
+end
 
 implement main () = {
   var context = zmq_init (1)
@@ -36,74 +35,48 @@ implement main () = {
   val r = zmq_setsockopt_string (subscriber, ZMQ_SUBSCRIBE, filter, string_length (filter))
   val () = assertloc (r = 0)
 
-  var !p_items with pf_items = @[zmq_pollitem_t?][2]()
-  prval (pf_car, pf_cdr) = array_v_uncons {zmq_pollitem_t?} (pf_items)
-  val () = zmq_pollitem_init (pf_car | p_items, receiver, 0, ZMQ_POLLIN)
-
-  prval (pf_cadr, pf_cddr) = array_v_uncons {zmq_pollitem_t?} (pf_cdr)
-  val () = zmq_pollitem_init (pf_cadr | p_items + sizeof<zmq_pollitem_t?>, subscriber, 0, ZMQ_POLLIN)
-
-  prval () = array_v_unnil {zmq_pollitem_t?} (pf_cddr)
-  prval () = pf_cddr := array_v_nil {zmq_pollitem_t} ()
-
-  prval () = pf_items := array_v_cons (pf_car, array_v_cons (pf_cadr, pf_cddr))
- 
-  val () = loop (pf_items | p_items) where {
-             fun loop {l:agz} (pf_items: !array_v (zmq_pollitem_t, 2, l) | p_items: ptr l): void = {
-               val r = zmq_poll (pf_items  | p_items, 2, lint_of_int (~1))
+  val zero = int16_of_int 0
+  var !p_items = @[zmq_pollitem_t](@{socket= ptr_of_zmqsocket (receiver),   fd= 0, events= ZMQ_POLLIN, revents= zero},
+                                   @{socket= ptr_of_zmqsocket (subscriber), fd= 0, events= ZMQ_POLLIN, revents= zero})
+  val () = loop (!p_items) where {
+             fun loop (items: &(@[zmq_pollitem_t][2])): void = {
+               val r = zmq_poll (view@ items  | &items, 2, lint_of_int (~1))
                val () = assertloc (r >= 0)
 
-               prval (pf_car, pf_cdr) = array_v_uncons {zmq_pollitem_t} (pf_items)
-               val () = if :(pf_car: zmq_pollitem_t @ l) => check_revents (pf_car | p_items, ZMQ_POLLIN) then {
-                          var message: zmq_msg_t
-                          val r = zmq_msg_init (message)
-                          val () = assertloc (r = 0)
+               val () = let
+                         fun check_poll (item: &zmq_pollitem_t, func: () -> void): void = {
+                            val () = if check_revents (item, ZMQ_POLLIN) then {
+                              var message: zmq_msg_t
+                              val r = zmq_msg_init (message)
+                              val () = assertloc (r = 0)
 
-                          val () = assertloc (~p_items->socket)
-                          val r = zmq_recv (p_items->socket, message, 0)
-                          val () = assertloc (r = 0)
+                              val (pff_s | s) = zmqsocket_of_ptr (item.socket)
+                              val () = assertloc (~s)
+                              val r = zmq_recv (s, message, 0)
+                              val () = assertloc (r = 0)
+                              prval () = pff_s (s)
 
-                          val () = print_string ("Process task\n")
-                          val r = zmq_msg_close (message)
-                          val () = assertloc (r = 0)
-                        }
+                              val () = func ()
+                              val r = zmq_msg_close (message)
+                              val () = assertloc (r = 0)
+                            }
+                          }
+                         in
+                          check_poll (items.[0], lam () => print_string ("Process task\n"));
+                          check_poll (items.[1], lam () => print_string ("Process weather update\n"))
+                         end
 
-               prval (pf_cadr, pf_cddr) = array_v_uncons {zmq_pollitem_t} (pf_cdr)
-               val p_item2 = p_items + sizeof<zmq_pollitem_t>
-               val () = if :(pf_cadr: zmq_pollitem_t @ (l + sizeof zmq_pollitem_t)) => check_revents (pf_cadr | p_item2, ZMQ_POLLIN) then {
-                          var message: zmq_msg_t
-                          val r = zmq_msg_init (message)
-                          val () = assertloc (r = 0)
- 
-                           val () = assertloc (~p_item2->socket)
-                          val r = zmq_recv (p_item2->socket, message, 0)
-                          val () = assertloc (r = 0)
-
-                          val () = print_string ("Process weather update\n")
-                          val r = zmq_msg_close (message)
-                          val () = assertloc (r = 0)
-                        }
-               prval () = pf_items := array_v_cons (pf_car, array_v_cons (pf_cadr, pf_cddr))
-               val () = loop (pf_items | p_items)
+               val () = loop (items)
              }
            }
 
   (*  We never get here *)
-  prval (pf_car, pf_cdr) = array_v_uncons {zmq_pollitem_t} (pf_items)
-  val () = assertloc (~p_items->socket)
-  val r = zmq_close (p_items->socket)
+  val r = zmq_close (receiver)
   val () = assertloc (r = 0)
 
-  prval (pf_cadr, pf_cddr) = array_v_uncons {zmq_pollitem_t} (pf_cdr)
-  val () = assertloc (~(p_items+sizeof<zmq_pollitem_t>)->socket)
-  val r = zmq_close ((p_items+sizeof<zmq_pollitem_t>)->socket)
+  val r = zmq_close (subscriber)
   val () = assertloc (r = 0)
 
-  prval () = array_v_unnil {zmq_pollitem_t} (pf_cddr)
-  prval () = pf_cddr := array_v_nil {zmq_pollitem_t?} ()
-
-  prval () = pf_items := array_v_cons (pf_car, array_v_cons (pf_cadr, pf_cddr))
- 
   val r = zmq_term (context)
   val () = assertloc (r = 0)
 }
