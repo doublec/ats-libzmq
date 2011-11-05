@@ -3,8 +3,6 @@
   This version uses zmq_poll()
 *)
 staload "contrib/libzmq/SATS/libzmq.sats"
-staload "prelude/SATS/array.sats"
-staload "prelude/DATS/array.dats"
 
 fun check_revents (item: &zmq_pollitem_t, flag: int16): bool = let
   val r = uint_of_int (int_of_int16 (item.revents))
