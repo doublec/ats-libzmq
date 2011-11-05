@@ -22,7 +22,9 @@ compall: \
   taskwork \
   tasksink \
   msreader \
-  mspoller
+  mspoller \
+  taskwork2 \
+  tasksink2
 
 ######
 
@@ -56,6 +58,12 @@ msreader: msreader.dats
 mspoller: mspoller.dats
 	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
+taskwork2: taskwork2.dats
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+
+tasksink2: tasksink2.dats
+	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+
 ######
 
 clean:
@@ -72,5 +80,7 @@ cleanall: clean
 	rm -f tasksink
 	rm -f msreader
 	rm -f mspoller
+	rm -f taskwork2
+	rm -f tasksink2
 
 ###### end of [Makefile] ######
