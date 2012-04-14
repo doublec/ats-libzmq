@@ -36,7 +36,7 @@ implement main () = {
     (*  Do the work *)
     val ms = int1_of (castvwtp1 {string} (str)) * 1000
     val ms = max(0, min(MILLION, ms))
-    val () = usleep (ms)
+    val _ =  usleep (ms)
     val () = strptr_free (str)
 
     (*  Send results to sink *)

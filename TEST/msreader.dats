@@ -59,7 +59,7 @@ implement main () = {
 
                  (*  No activity, so sleep for 1 msec *)
                  val ms = max(0, min(MILLION, 1)) 
-                 val () = usleep (ms)
+                 val _  = usleep (ms)
 
 
                  val () = loop (receiver, subscriber)

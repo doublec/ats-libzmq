@@ -34,7 +34,7 @@ implement main () = {
     val () = assertloc (r = 0)
  
     (* Do some work *)
-    val _ = sleep(1)
+    val _ = sleep(1u)
 
     (* Send reply back to client *)
     var reply: zmq_msg_t

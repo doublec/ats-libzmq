@@ -52,7 +52,7 @@ implement main () = {
   val () = printf ("Total expected cost: %d msec\n", @(total_msec))
 
   (*  Give 0MQ time to deliver *)
-  val _ = sleep (1);
+  val _ = sleep (1u);
 
   val _ = zmq_close (sink)
   val _ = zmq_close (sender)
