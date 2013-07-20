@@ -3,7 +3,7 @@
   Binds REP socket to tcp://*:5555
   Expects "Hello" from client, replies with "World"
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/unistd.sats"
 staload "prelude/SATS/string.sats"
 staload "libc/SATS/string.sats"

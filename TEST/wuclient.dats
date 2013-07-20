@@ -3,7 +3,7 @@
   Connects SUB socket to tcp://localhost:5556
   Collects weather updates and finds avg temp in zipcode
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 
 implement main (argc, argv) = {
   val context = zmq_init (1)

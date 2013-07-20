@@ -10,15 +10,11 @@ REMOTE=http://github.com/doublec/ats-libzmq
 ATSHOMEQ="$(ATSHOME)"
 ATSCC=$(ATSHOMEQ)/bin/atscc -Wall
 CFLAGS=`pkg-config libzmq --cflags`
+ATSCCLIB=$(shell pwd)/..
 
 ######
 
-all: .git atsctrb_libzmq.o clean
-
-######
-
-.git:
-	rm Makefile README.ATS && git clone $(REMOTE) .
+all: atsctrb_libzmq.o clean
 
 ######
 
@@ -28,7 +24,7 @@ atsctrb_libzmq.o: libzmq_dats.o
 ######
 
 libzmq_dats.o: DATS/libzmq.dats
-	$(ATSCC) $(CFLAGS) -o $@ -c $<
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ -c $<
 
 ######
 
@@ -37,8 +33,5 @@ clean::
 
 cleanall: clean
 	rm -f atsctrb_libzmq.o
-
-cleangit: .git
-	rm -r * && git checkout Makefile README.ATS && rm -rf .git .gitignore
 
 ###### end of [Makefile] ######

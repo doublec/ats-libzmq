@@ -14,7 +14,7 @@
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 *)
 %{#
-#include "contrib/libzmq/CATS/libzmq.cats"
+#include "libzmq/CATS/libzmq.cats"
 %}
 
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time

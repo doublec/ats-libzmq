@@ -2,7 +2,7 @@
   Reading from multiple sockets
   This version uses a simple recv loop
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/unistd.sats"
 
 implement main () = {

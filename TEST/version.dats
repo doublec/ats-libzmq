@@ -1,7 +1,7 @@
 (*
   Report 0MQ version
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 
 implement main () = {
   var major: int?

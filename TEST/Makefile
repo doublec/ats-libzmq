@@ -2,8 +2,9 @@
 
 ATSHOMEQ="$(ATSHOME)"
 ATSCC=$(ATSHOMEQ)/bin/atscc
+ATSCCLIB=$(shell pwd)/../..
 ATSCTRB=\
-  $(ATSHOMEQ)/contrib/libzmq/atsctrb_libzmq.o
+  $(ATSCCLIB)/libzmq/atsctrb_libzmq.o
 CFLAGS=`pkg-config libzmq --cflags`
 LIBS=`pkg-config libzmq --libs`
 ######
@@ -29,40 +30,40 @@ compall: \
 ######
 
 hwserver: hwserver.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 hwclient: hwclient.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 version: version.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 wuserver: wuserver.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 wuclient: wuclient.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 taskvent: taskvent.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 taskwork: taskwork.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 tasksink: tasksink.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 msreader: msreader.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 mspoller: mspoller.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 taskwork2: taskwork2.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 tasksink2: tasksink2.dats
-	$(ATSCC) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
+	$(ATSCC) -I$(ATSCCLIB) -IATS$(ATSCCLIB) $(CFLAGS) -o $@ $< $(ATSCTRB) $(LIBS)
 
 ######
 

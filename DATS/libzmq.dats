@@ -13,7 +13,7 @@
 ** ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 ** OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/string.sats"
 
 #define ATS_DYNLOADFLAG 0 // no need for dynloading at run-time

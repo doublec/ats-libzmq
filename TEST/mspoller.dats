@@ -2,7 +2,7 @@
   Reading from multiple sockets
   This version uses zmq_poll()
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 
 fun check_revents (item: &zmq_pollitem_t, flag: int16): bool = let
   val r = uint_of_int (int_of_int16 (item.revents))

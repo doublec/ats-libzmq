@@ -2,7 +2,7 @@
  Task sink - design 2
  Adds pub-sub flow to send kill signal to workers
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/sys/SATS/time.sats"
 staload "libc/sys/SATS/types.sats"
 staload "libc/SATS/stdio.sats"

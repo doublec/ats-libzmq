@@ -3,7 +3,7 @@
   Binds PUSH socket to tcp://localhost:5557
   Sends batch of tasks to workers via that socket
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/stdio.sats"
 staload "libc/SATS/random.sats"
 staload "libc/SATS/unistd.sats"

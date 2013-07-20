@@ -3,7 +3,7 @@
   Binds PUB socket to tcp://*:5556
   Publishes random weather updates
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/random.sats"
 staload "prelude/SATS/unsafe.sats"
 

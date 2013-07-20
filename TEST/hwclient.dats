@@ -3,7 +3,7 @@
   Connects REQ socket to tcp://localhost:5555
   Sends "Hello" to server, expects "World" back
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "prelude/SATS/string.sats"
 staload "libc/SATS/string.sats"
 

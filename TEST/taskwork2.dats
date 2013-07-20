@@ -2,7 +2,7 @@
   Task worker - design 2
   Adds pub-sub flow to receive and respond to kill signal
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/unistd.sats"
 staload "libc/SATS/stdio.sats"
 staload "prelude/SATS/unsafe.sats"

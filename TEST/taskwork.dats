@@ -5,7 +5,7 @@
   Connects PUSH socket to tcp://localhost:5558
   Sends results to sink via that socket
 *)
-staload "contrib/libzmq/SATS/libzmq.sats"
+staload "libzmq/SATS/libzmq.sats"
 staload "libc/SATS/unistd.sats"
 staload "libc/SATS/stdio.sats"
 staload "prelude/SATS/unsafe.sats"

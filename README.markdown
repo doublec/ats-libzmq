@@ -6,6 +6,10 @@ This is an [ATS](http://zguide.zeromq.org/page:all) wrapper for the
 in that it wraps the C API and can be used in the same way. It includes
 ATS types to ensure that unsafe use of the library are compile time errors.
 
+2013-07-21: Note that the latest version of ATS includes a wrapper for
+libzmq in the 'contrib' directory. At some point I'll migrate my
+libzmq using libraries to that and deprecate this library.
+
 The [0MQ Guide](http://zguide.zeromq.org/page:all) has a number of
 examples in C. Some of these are converted
 to ATS in the TEST subdirectory. They have the same filename as the C 
@@ -33,11 +37,15 @@ Some items that remain to be done or are worth looking into:
 Build
 =====
 
-The library should be cloned within the 'contrib' subdirectory of the ATS source:
+The library is best used by cloning from under a parent directory that
+is used to store ATS libraries. This directory can then be passed to
+the 'atscc' command line using the '-I' and '-IATS' options to be
+added to the include path. In the examples below this directory is
+$ATSCCLIB.
 
-    $ cd $ATSHOME/contrib
-    $ git clone git://githib.com/double/ats-libmq.git
-    $ cd ats-libmq
+    $ cd $ATSCCLIB
+    $ git clone git://githib.com/double/ats-libzmq.git libzmq
+    $ cd libzmq
     $ make
     $ cd TEST
     $ make
